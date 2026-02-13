@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+venv.bak/
+env.bak/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.installed.cfg
+*.egg-info/
+var/
+
+# Django-specific
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+media/
+
+# Static files (if generated during deployment, otherwise include)
+static/
+
+# IDE-specific files (e.g. PyCharm, VS Code)
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+.Spotlight-V100
+.Trashes
