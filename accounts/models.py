@@ -5,9 +5,9 @@ from django.core.exceptions import ValidationError
 
 class CustomUser(AbstractUser):
   class Gender(models.TextChoices):
+    NONE = 'N', 'Prefer not to say'
     MALE = 'M', 'Male'
     FEMALE = 'F', 'Female'
-    NONE = 'N', 'Prefer not to say'
   
   bio = models.TextField(blank=True, max_length=2000)
   avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
