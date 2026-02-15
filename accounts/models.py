@@ -37,5 +37,4 @@ class Follow(models.Model):
     unique_together = ("user_from", "user_to")
 
   def __str__(self):
-    # Helpful representation in Django admin
     return f"{self.user_from} -> {self.user_to}"
