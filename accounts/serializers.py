@@ -4,6 +4,24 @@ from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
+class UserSerializer(serializers.ModelSerializer):
+  """
+  Serializer to obtain user information
+  """
+  follower_count = serializers.SerializerMethodField()
+  following_count = serializers.SerializerMethodField()
+  
+  class Meta:
+    model = User
+    fields = '__all__'
+    
+  def get_follower_count(self, obj):
+    return obj.followers.count()
+  
+  def get_following_count(self, obj):
+    return obj.following.count()
+  
+
 class RegisterSerializer(serializers.ModelSerializer):
   """
   Serializer for User creation/registration
