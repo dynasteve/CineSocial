@@ -4,9 +4,16 @@ from django.core.exceptions import ValidationError
 
 
 class CustomUser(AbstractUser):
+  class Gender(models.TextChoices):
+    MALE = 'M', 'Male'
+    FEMALE = 'F', 'Female'
+    NONE = 'N', 'Prefer not to say'
+  
   bio = models.TextField(blank=True, max_length=2000)
   avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+  date_of_birth = models.DateField(blank=False, null=False)
   is_admin = models.BooleanField(default=False)
+  gender = models.CharField(choices=Gender.choices, default=Gender.NONE)
 
   def __str__(self):
       return self.username
