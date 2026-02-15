@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 
 
 class CustomUser(AbstractUser):
-  
   bio = models.TextField(blank=True, max_length=2000)
   avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
   is_admin = models.BooleanField(default=False)

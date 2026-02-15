@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+# Apps urls
 urlpatterns += [
     path("api/accounts/", include("accounts.urls")),
 ]
