@@ -13,4 +13,5 @@ urlpatterns = [
 # Apps urls
 urlpatterns += [
     path("api/accounts/", include("accounts.urls")),
+    path("api/feed/", include("post.urls")),
 ]
