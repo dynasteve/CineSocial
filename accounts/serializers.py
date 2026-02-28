@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
   """
   follower_count = serializers.SerializerMethodField()
   following_count = serializers.SerializerMethodField()
+  is_following = serializers.SerializerMethodField()
   
   class Meta:
     model = User
