@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import Post, Like, Comment
-from .serializers import PostSerializer, Comment
+from .serializers import PostSerializer, CommentSerializer
 
 
 class PostCreateView(generics.CreateAPIView):
@@ -35,3 +35,19 @@ class PostLikeToggleView(APIView):
             return Response({"liked": False})
 
         return Response({"liked": True})
+      
+
+class CommentCreateView(generics.CreateAPIView):
+  """
+  Create a new comment on a post.
+  """
+  serializer_class = CommentSerializer
+  permission_classes = [IsAuthenticated]
+
+  def perform_create(self, serializer):
+    post_id = self.kwargs.get("post_id")
+    post = get_object_or_404(Post, id=post_id)
+    serializer.save(
+      author=self.request.user,
+      post=post  # pass instance, not _id
+    )
