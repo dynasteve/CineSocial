@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # Apps
     "accounts",
     "movies",
-    "blog",
+    "post",
     "news",
     "messaging",
     "core",
