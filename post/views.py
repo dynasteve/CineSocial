@@ -1,11 +1,18 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 from .models import Post, Like, Comment
 from .serializers import PostSerializer, CommentSerializer
 
+
+class PostDetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [AllowAny]
 
 class PostCreateView(generics.CreateAPIView):
     """
@@ -37,6 +44,11 @@ class PostLikeToggleView(APIView):
         return Response({"liked": True})
       
 
+class CommentDetailView(generics.RetrieveAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [AllowAny]
+
 class CommentCreateView(generics.CreateAPIView):
   """
   Create a new comment on a post.
@@ -50,4 +62,38 @@ class CommentCreateView(generics.CreateAPIView):
     serializer.save(
       author=self.request.user,
       post=post  # pass instance, not _id
+    )
+    
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["created_at", "like_count", "comment_count"]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = user.following.values_list("user_to", flat=True)
+
+        return (
+            Post.objects
+            .filter(author__id__in=following_ids)
+            .annotate(
+                like_count=Count("likes"),
+                comment_count=Count("comments"),
+            )
+        )
+      
+      
+def get_queryset(self):
+    user = self.request.user
+    following_ids = user.following.values_list("user_to", flat=True)
+
+    return (
+        Post.objects
+        .filter(author__id__in=following_ids)
+        .annotate(
+            like_count=Count("likes"),
+            comment_count=Count("comments")
+        )
     )
