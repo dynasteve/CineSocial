@@ -63,3 +63,24 @@ class PostSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         validated_data["author"] = request.user
         return super().create(validated_data)
+      
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "author",
+            "post",
+            "content",
+            "parent",
+            "replies",
+            "created_at",
+        ]
+        read_only_fields = ["id", "author", "replies", "created_at"]
+
+    def get_replies(self, obj):
+        # Nested replies for threaded comments
+        return CommentSerializer(obj.replies.all(), many=True).data
