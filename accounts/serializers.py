@@ -24,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             "gender",
             "follower_count",
             "following_count",
+            "is_following",
         ]
     read_only_fields = ["id", "follower_count", "following_count"]
     
@@ -33,6 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
   def get_following_count(self, obj):
     return obj.following.count()
   
+  def get_is_following(self, obj):
+    request = self.context.get("request")
+
+    if request is None or request.user.is_anonymous:
+        return False
+
+    return obj.followers.filter(user_from=request.user).exists()
 
 class RegisterSerializer(serializers.ModelSerializer):
   """
