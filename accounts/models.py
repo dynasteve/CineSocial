@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
   
   bio = models.TextField(blank=True, max_length=2000)
   avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
-  date_of_birth = models.DateField(blank=False, null=False)
+  date_of_birth = models.DateField(blank=True, null=True)
   is_admin = models.BooleanField(default=False)
   gender = models.CharField(choices=Gender.choices, default=Gender.NONE)
 
