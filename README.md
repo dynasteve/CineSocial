@@ -196,3 +196,32 @@ NEWS_API_KEY=your_news_api_key
 
 * All data modification endpoints require JWT authentication.
 * Interactions (Likes, Follows, Reviews) are toggle-based or update-on-resubmit.
+
+### Endpoint summary
+| Method | Path                                  | Auth Required | Description                              | Response Notes                                                             |
+| ------ | ------------------------------------- | ------------- | ---------------------------------------- | -------------------------------------------------------------------------- |
+| POST   | /api/auth/register/                   | No            | Register a new user                      | Created user data (password excluded)                                      |
+| POST   | /api/auth/login/                      | No            | Login and get JWT                        | `access` and `refresh` tokens                                              |
+| GET    | /api/profiles/{username}/             | Optional      | Get a user profile                       | Includes `follower_count`, `following_count`, `is_following`               |
+| POST   | /api/profiles/{username}/follow/      | Yes           | Toggle follow/unfollow                   | `{"following": true/false}`                                                |
+| POST   | /api/posts/create/                    | Yes           | Create a new post                        | Post object                                                                |
+| POST   | /api/posts/{post_id}/repost/          | Yes           | Create a repost of a post                | Repost object                                                              |
+| POST   | /api/posts/{post_id}/like/            | Yes           | Toggle like/unlike                       | `{"liked": true/false}`                                                    |
+| POST   | /api/posts/{post_id}/comment/         | Yes           | Add a comment to a post                  | Comment object                                                             |
+| GET    | /api/posts/{post_id}/comments/        | Optional      | Retrieve all comments for a post         | Threaded comments with `replies`                                           |
+| GET    | /api/posts/feed/                      | Yes           | Retrieve posts from followed users       | Paginated post objects                                                     |
+| GET    | /api/posts/{post_id}/                 | Optional      | Retrieve a single post                   | Post object with counts and `is_liked`                                     |
+| GET    | /api/movies/search/?query=            | Optional      | Search TMDB movies                       | Movie list with `average_rating` and `review_count` if rated locally       |
+| GET    | /api/movies/{tmdb_id}/                | Optional      | Get movie details                        | TMDB data + local ratings                                                  |
+| POST   | /api/movies/{tmdb_id}/review/         | Yes           | Submit or update a review                | Review object                                                              |
+| POST   | /api/movies/{tmdb_id}/list/           | Yes           | Add/remove from Favorites or Watchlist   | Updated UserMovieList object                                               |
+| GET    | /api/movies/list/favorite/            | Yes           | Get current user favorites               | Paginated list of TMDB IDs and metadata                                    |
+| GET    | /api/movies/list/watchlist/           | Yes           | Get current user watchlist               | Paginated list of TMDB IDs and metadata                                    |
+| POST   | /api/messages/send/                   | Yes           | Send a private message                   | Message object                                                             |
+| GET    | /api/messages/inbox/                  | Yes           | Retrieve messages received               | Paginated Message objects                                                  |
+| GET    | /api/messages/conversation/{user_id}/ | Yes           | Retrieve conversation with specific user | Paginated messages in both directions                                      |
+| POST   | /api/messages/{message_id}/read/      | Yes           | Mark a message as read                   | `{"detail": "Message marked as read."}`                                    |
+| GET    | /api/messages/unread-count/           | Yes           | Get count of unread messages             | `{"unread_count": number}`                                                 |
+| GET    | /api/news/                            | Optional      | Get trending or queried news articles    | List of articles with title, description, url, image, published_at, source |
+| GET    | /api/news/?q=                         | Optional      | Search news by query                     | Same as above, filtered                                                    |
+
