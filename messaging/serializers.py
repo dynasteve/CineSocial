@@ -5,16 +5,15 @@ from .models import Message
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.StringRelatedField(read_only=True)
+    sender_id = serializers.IntegerField(source='sender.id', read_only=True)  # ADD - frontend needs this
 
     class Meta:
         model = Message
-        fields = ["id", "sender", "receiver", "content", "created_at", "is_read"]
-        read_only_fields = ["id", "sender", "created_at", "is_read"]
-        
-        def perform_create(self, serializer):
-            receiver = serializer.validated_data["receiver"]
+        fields = ["id", "sender", "sender_id", "receiver", "content", "created_at", "is_read"]
+        read_only_fields = ["id", "sender", "sender_id", "created_at", "is_read"]
 
-            if receiver == self.request.user:
-                raise ValidationError("Cannot message yourself.")
-
-            serializer.save(sender=self.request.user)
+    def validate_receiver(self, value):                    # MOVED OUT of Meta
+        request = self.context.get("request")
+        if request and value == request.user:
+            raise ValidationError("Cannot message yourself.")
+        return value

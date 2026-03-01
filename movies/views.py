@@ -3,10 +3,15 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .services.tmdb import search_movies, get_movie_details
+from .services.tmdb import *
 from .serializers import *
 from .models import *
 
+class TrendingMoviesView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request):
+        data = get_trending_movies()
+        return Response(data)
 
 class MovieSearchView(APIView):
     permission_classes = [AllowAny]
@@ -89,3 +94,12 @@ class UserMovieListView(ListAPIView):
             user=self.request.user,
             list_type=list_type
         )
+        
+
+class MovieReviewListView(ListAPIView):
+    serializer_class = MovieReviewSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        tmdb_id = self.kwargs["tmdb_id"]
+        return MovieReview.objects.filter(tmdb_id=tmdb_id).select_related("user")

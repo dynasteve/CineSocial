@@ -6,6 +6,19 @@ from django.db.models import Avg, Count
 
 BASE_URL = "https://api.themoviedb.org/3"
 
+def get_trending_movies():
+    cache_key = "tmdb_trending"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    url = f"{BASE_URL}/trending/movie/week"
+    params = {"api_key": settings.TMDB_API_KEY}
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    cache.set(cache_key, data, timeout=60 * 60)
+    return data
 
 def _attach_review_stats(movies):
     """
@@ -17,6 +30,7 @@ def _attach_review_stats(movies):
 
     tmdb_ids = [movie["id"] for movie in movies]
 
+    # Use .values() + .annotate() only — no .aggregate() at the end
     review_stats = (
         MovieReview.objects
         .filter(tmdb_id__in=tmdb_ids)
@@ -25,7 +39,6 @@ def _attach_review_stats(movies):
             average_rating=Avg("rating"),
             review_count=Count("id")
         )
-        .aggregate(avg=Avg("rating"))
     )
 
     stats_map = {
@@ -33,7 +46,7 @@ def _attach_review_stats(movies):
             "average_rating": round(item["average_rating"], 2),
             "review_count": item["review_count"]
         }
-        for item in review_stats
+        for item in review_stats  # now iterates queryset rows correctly
     }
 
     for movie in movies:
@@ -44,7 +57,7 @@ def _attach_review_stats(movies):
     return movies
 
 def search_movies(query):
-    cache_key = f"tmdb_search_{query}"
+    cache_key = f"tmdb_search_{query.replace(' ', '_')}"
     cached = cache.get(cache_key)
 
     if cached:

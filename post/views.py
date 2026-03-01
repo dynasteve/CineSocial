@@ -85,18 +85,18 @@ class FeedView(generics.ListAPIView):
         )
       
       
-def get_queryset(self):
-    user = self.request.user
-    following_ids = user.following.values_list("user_to", flat=True)
+    def get_queryset(self):
+        user = self.request.user
+        following_ids = user.following.values_list("user_to", flat=True)
 
-    return (
-        Post.objects
-        .filter(author__id__in=following_ids)
-        .annotate(
-            like_count=Count("likes"),
-            comment_count=Count("comments")
+        return (
+            Post.objects
+            .filter(author__id__in=following_ids)
+            .annotate(
+                like_count=Count("likes"),
+                comment_count=Count("comments")
+            )
         )
-    )
     
     
 class PostRepostView(APIView):
@@ -108,8 +108,47 @@ class PostRepostView(APIView):
         repost = Post.objects.create(
             author=request.user,
             original_post=original_post,
-            content=request.data.get("content", "")
+            content = request.data.get("content") or f"Reposted from @{original_post.author.username}"
         )
 
         serializer = PostSerializer(repost, context={"request": request})
         return Response(serializer.data)
+    
+
+class PostListCreateView(generics.ListCreateAPIView):
+    serializer_class = PostSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Post.objects.all().annotate(
+                like_count=Count("likes"),
+                comment_count=Count("comments"),
+            )
+        following_ids = user.following.values_list("user_to", flat=True)
+        followed_posts = Post.objects.filter(
+            author__id__in=following_ids
+        ).annotate(
+            like_count=Count("likes"),
+            comment_count=Count("comments"),
+        )
+        other_posts = Post.objects.exclude(
+            author__id__in=following_ids
+        ).exclude(
+            author=user
+        ).annotate(
+            like_count=Count("likes"),
+            comment_count=Count("comments"),
+        )
+        # Combine: followed posts first, then everything else
+        from itertools import chain
+        return list(chain(followed_posts, other_posts))
+
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
