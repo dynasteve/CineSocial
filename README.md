@@ -1,6 +1,3 @@
-This is a professionally formatted, comprehensive GitHub `README.md` for the **CineSocial Backend API**. It includes functional anchors for the Table of Contents, syntax-highlighted code blocks, and organized tables for API references.
-
-```markdown
 # CineSocial Backend API
 
 CineSocial is a headless social platform designed for movie lovers. It provides a JSON REST API built with **Django REST Framework (DRF)**, secured with **JWT** authentication, and integrated with **TMDB** for film data and **NewsAPI** for entertainment headlines.
