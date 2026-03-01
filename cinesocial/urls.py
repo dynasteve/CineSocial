@@ -16,4 +16,5 @@ urlpatterns += [
     path("api/feed/", include("post.urls")),
     path("api/movies/", include("movies.urls")),
     path("api/messages/", include("messaging.urls")),
+    path("api/news/", include("news.urls")),
 ]

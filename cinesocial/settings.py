@@ -38,6 +38,10 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 if not TMDB_API_KEY:
     raise ValueError("TMDB_API_KEY not set in environment variables")
 
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+if not NEWS_API_KEY:
+    raise ValueError("NEWS_API_KEY not set in environment variables")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -159,7 +163,15 @@ REST_FRAMEWORK = {
     "rest_framework.filters.OrderingFilter",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 20,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "50/day",
+        "user": "1000/day",
+    },
 }
 
 SIMPLE_JWT = {
@@ -168,4 +180,11 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
 }
