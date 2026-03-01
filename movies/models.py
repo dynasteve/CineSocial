@@ -8,7 +8,7 @@ class MovieReview(models.Model):
         related_name="movie_reviews"
     )
     tmdb_id = models.IntegerField()  # only store TMDB ID
-    rating = models.PositiveSmallIntegerField()
+    rating = models.PositiveSmallIntegerField(db_index=True)
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -31,7 +31,7 @@ class UserMovieList(models.Model):
         on_delete=models.CASCADE,
         related_name="movie_lists"
     )
-    tmdb_id = models.IntegerField()
+    tmdb_id = models.IntegerField(db_index=True)
     list_type = models.CharField(max_length=20, choices=LIST_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
 
