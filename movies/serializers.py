@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MovieReview
+from .models import *
 
 class MovieReviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,3 +11,9 @@ class MovieReviewSerializer(serializers.ModelSerializer):
         if not 1 <= value <= 10:
             raise serializers.ValidationError("Rating must be between 1 and 10")
         return value
+
+class UserMovieListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMovieList
+        fields = ["id", "user", "tmdb_id", "list_type", "created_at"]
+        read_only_fields = ["id", "user", "created_at"]

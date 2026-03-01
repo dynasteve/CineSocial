@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .services.tmdb import search_movies, get_movie_details
-from .serializers import MovieReviewSerializer
+from .serializers import *
 from .models import *
 
 
@@ -54,4 +54,38 @@ class MovieReviewCreateView(CreateAPIView):
         return Response(
             MovieReviewSerializer(review, context={"request": request}).data,
             status=status.HTTP_200_OK
+        )
+        
+        
+class UserMovieListToggleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, tmdb_id):
+        list_type = request.data.get("list_type")
+
+        if list_type not in ["favorite", "watchlist"]:
+            return Response({"error": "Invalid list type"}, status=400)
+
+        obj, created = UserMovieList.objects.get_or_create(
+            user=request.user,
+            tmdb_id=tmdb_id,
+            list_type=list_type
+        )
+
+        if not created:
+            obj.delete()
+            return Response({"added": False})
+
+        return Response({"added": True})
+      
+      
+class UserMovieListView(ListAPIView):
+    serializer_class = UserMovieListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        list_type = self.kwargs["list_type"]
+        return UserMovieList.objects.filter(
+            user=self.request.user,
+            list_type=list_type
         )
