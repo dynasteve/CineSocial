@@ -97,3 +97,19 @@ def get_queryset(self):
             comment_count=Count("comments")
         )
     )
+    
+    
+class PostRepostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        original_post = get_object_or_404(Post, pk=pk)
+
+        repost = Post.objects.create(
+            author=request.user,
+            original_post=original_post,
+            content=request.data.get("content", "")
+        )
+
+        serializer = PostSerializer(repost, context={"request": request})
+        return Response(serializer.data)
