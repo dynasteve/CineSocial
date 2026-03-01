@@ -43,6 +43,27 @@ def _attach_review_stats(movies):
 
     return movies
 
+def search_movies(query):
+    cache_key = f"tmdb_search_{query}"
+    cached = cache.get(cache_key)
+
+    if cached:
+        return cached
+
+    url = f"{BASE_URL}/search/movie"
+    params = {
+        "api_key": settings.TMDB_API_KEY,
+        "query": query,
+    }
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+
+    data = response.json()
+
+    cache.set(cache_key, data, timeout=60 * 60)  # 1 hour
+    return data
+
 
 def get_movie_details(tmdb_id):
     """
