@@ -198,30 +198,27 @@ NEWS_API_KEY=your_news_api_key
 * Interactions (Likes, Follows, Reviews) are toggle-based or update-on-resubmit.
 
 ### Endpoint summary
-| Method | Path                                  | Auth Required | Description                              | Response Notes                                                             |
-| ------ | ------------------------------------- | ------------- | ---------------------------------------- | -------------------------------------------------------------------------- |
-| POST   | /api/auth/register/                   | No            | Register a new user                      | Created user data (password excluded)                                      |
-| POST   | /api/auth/login/                      | No            | Login and get JWT                        | `access` and `refresh` tokens                                              |
-| GET    | /api/profiles/{username}/             | Optional      | Get a user profile                       | Includes `follower_count`, `following_count`, `is_following`               |
-| POST   | /api/profiles/{username}/follow/      | Yes           | Toggle follow/unfollow                   | `{"following": true/false}`                                                |
-| POST   | /api/posts/create/                    | Yes           | Create a new post                        | Post object                                                                |
-| POST   | /api/posts/{post_id}/repost/          | Yes           | Create a repost of a post                | Repost object                                                              |
-| POST   | /api/posts/{post_id}/like/            | Yes           | Toggle like/unlike                       | `{"liked": true/false}`                                                    |
-| POST   | /api/posts/{post_id}/comment/         | Yes           | Add a comment to a post                  | Comment object                                                             |
-| GET    | /api/posts/{post_id}/comments/        | Optional      | Retrieve all comments for a post         | Threaded comments with `replies`                                           |
-| GET    | /api/posts/feed/                      | Yes           | Retrieve posts from followed users       | Paginated post objects                                                     |
-| GET    | /api/posts/{post_id}/                 | Optional      | Retrieve a single post                   | Post object with counts and `is_liked`                                     |
-| GET    | /api/movies/search/?query=            | Optional      | Search TMDB movies                       | Movie list with `average_rating` and `review_count` if rated locally       |
-| GET    | /api/movies/{tmdb_id}/                | Optional      | Get movie details                        | TMDB data + local ratings                                                  |
-| POST   | /api/movies/{tmdb_id}/review/         | Yes           | Submit or update a review                | Review object                                                              |
-| POST   | /api/movies/{tmdb_id}/list/           | Yes           | Add/remove from Favorites or Watchlist   | Updated UserMovieList object                                               |
-| GET    | /api/movies/list/favorite/            | Yes           | Get current user favorites               | Paginated list of TMDB IDs and metadata                                    |
-| GET    | /api/movies/list/watchlist/           | Yes           | Get current user watchlist               | Paginated list of TMDB IDs and metadata                                    |
-| POST   | /api/messages/send/                   | Yes           | Send a private message                   | Message object                                                             |
-| GET    | /api/messages/inbox/                  | Yes           | Retrieve messages received               | Paginated Message objects                                                  |
-| GET    | /api/messages/conversation/{user_id}/ | Yes           | Retrieve conversation with specific user | Paginated messages in both directions                                      |
-| POST   | /api/messages/{message_id}/read/      | Yes           | Mark a message as read                   | `{"detail": "Message marked as read."}`                                    |
-| GET    | /api/messages/unread-count/           | Yes           | Get count of unread messages             | `{"unread_count": number}`                                                 |
-| GET    | /api/news/                            | Optional      | Get trending or queried news articles    | List of articles with title, description, url, image, published_at, source |
-| GET    | /api/news/?q=                         | Optional      | Search news by query                     | Same as above, filtered                                                    |
-
+| Method | Path                                  | Auth Required | Description                              | Notes                                                                            |
+| ------ | ------------------------------------- | ------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
+| POST   | /api/auth/login/                      | No            | Obtain JWT access and refresh tokens     | Use `access` for authenticated requests                                          |
+| POST   | /api/auth/refresh/                    | No            | Refresh access token using refresh token | Returns new access token                                                         |
+| POST   | /api/accounts/register/               | No            | Register a new user                      | Requires username, email, password/password2, bio, avatar, date_of_birth, gender |
+| GET    | /api/accounts/profiles/<username>     | Optional      | Retrieve user profile                    | Includes follower/following counts and is_following relative to current user     |
+| GET    | /api/accounts/test/                   | Optional      | Test authentication endpoint             | Returns simple auth verification                                                 |
+| POST   | /api/feed/posts/                      | Yes           | Create a new post                        | Include `content`, optional `image`, optional `tmdb_id`                          |
+| POST   | /api/feed/posts/<pk>/like/            | Yes           | Toggle like/unlike a post                | Returns `{"liked": true/false}`                                                  |
+| POST   | /api/feed/posts/<post_id>/comment/    | Yes           | Add a comment to a post                  | Include `content`                                                                |
+| GET    | /api/feed/posts/<pk>/                 | Optional      | Retrieve a single post                   | Includes counts: likes, comments, reposts, and `is_liked`                        |
+| GET    | /api/feed/comments/<pk>/              | Optional      | Retrieve a single comment                | Includes threaded replies                                                        |
+| POST   | /api/feed/posts/<pk>/repost/          | Yes           | Create a repost of an existing post      | Returns the repost object                                                        |
+| GET    | /api/movies/search/                   | Optional      | Search TMDB movies                       | Query param: `?query=<text>`; includes local average_rating if reviewed          |
+| GET    | /api/movies/<tmdb_id>/                | Optional      | Get TMDB movie details                   | Includes local ratings: average_rating and review_count                          |
+| POST   | /api/movies/<tmdb_id>/review/         | Yes           | Submit or update a movie review          | Include `rating` and `content`                                                   |
+| POST   | /api/movies/<tmdb_id>/list/           | Yes           | Toggle movie in Favorites or Watchlist   | Include `list_type` = favorite/watchlist                                         |
+| GET    | /api/movies/list/<list_type>/         | Yes           | Retrieve current user's movies in a list | `<list_type>` = favorite or watchlist                                            |
+| GET    | /api/messages/send/                   | Yes           | Send a private message                   | Include `receiver` (user id) and `content`                                       |
+| GET    | /api/messages/inbox/                  | Yes           | Retrieve inbox messages                  | Paginated                                                                        |
+| GET    | /api/messages/conversation/<user_id>/ | Yes           | Retrieve conversation with specific user | Paginated, bidirectional                                                         |
+| POST   | /api/messages/<pk>/read/              | Yes           | Mark a message as read                   | `pk` = message id                                                                |
+| GET    | /api/messages/unread-count/           | Yes           | Get unread messages count                | Returns `{"unread_count": number}`                                               |
+| GET    | /api/news/                            | Optional      | Retrieve trending news from News API     | Returns list of articles with title, url, source, published_at                   |
