@@ -15,4 +15,5 @@ urlpatterns += [
     path("api/accounts/", include("accounts.urls")),
     path("api/feed/", include("post.urls")),
     path("api/movies/", include("movies.urls")),
+    path("api/messages/", include("messaging.urls")),
 ]
