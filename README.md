@@ -1,6 +1,3 @@
-This is the properly formatted Markdown code for your GitHub `README.md`. It includes functional anchors for the Table of Contents, syntax highlighting for the code blocks, and correctly formatted tables.
-
-```markdown
 # CineSocial Backend API
 
 CineSocial is a headless social platform designed for movie enthusiasts. It provides movie data via TMDB integration and facilitates social interactions through posts, comments, likes, messaging, and news aggregation. 
